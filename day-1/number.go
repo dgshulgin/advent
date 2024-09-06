@@ -1,44 +1,45 @@
 package trebuchet
 
 import (
-	"errors"
 	"strconv"
 	"unicode"
 	"unicode/utf8"
 )
 
-func number(line string) (int, error) {
-	start := 0
+// Просматривает строку слева направо и возвращает первую найденную цифру num и ее позицию pos в строке line.
+// Если в строке отсутствуют цифры, либо произошла ошибка в качетстве позиции возвращает pos=-1.
+func number(line string) (num int, pos int) {
+	pos = 0
 	for {
-		rr, w := utf8.DecodeRuneInString(line[start:])
-		if rr == utf8.RuneError && w == 0 {
-			return 0, errors.New("в калибровочной строке отсутствуют цифры")
-		}
-		if rr == utf8.RuneError && w == 1 {
-			return 0, errors.New("ошибка кодировки в калибровочной строке")
+		rr, w := utf8.DecodeRuneInString(line[pos:])
+		// строка пуста, либо в ней присутствует ошибка кодировки
+		// как бы то нибыло, цифра не найдена
+		if rr == utf8.RuneError {
+			return 0, -1
 		}
 		if unicode.IsDigit(rr) {
 			num, _ := strconv.Atoi(string(rr))
-			return num, nil
+			return num, pos
 		}
-		start += w
+		pos += w
 	}
 }
 
-func numberLast(line string) (int, error) {
-	last := len(line)
+// Просматривает строку справа налево и возвращает первую найденную цифру num и ее позицию pos в строке line.
+// Если в строке отсутствуют цифры, либо произошла ошибка в качетстве позиции возвращает pos=-1.
+func numberLast(line string) (num int, pos int) {
+	pos = len(line)
 	for {
-		rr, w := utf8.DecodeLastRuneInString(line[:last])
-		if rr == utf8.RuneError && w == 0 {
-			return 0, errors.New("в калибровочной строке отсутствуют цифры")
-		}
-		if rr == utf8.RuneError && w == 1 {
-			return 0, errors.New("ошибка кодировки в калибровочной строке")
+		rr, w := utf8.DecodeLastRuneInString(line[:pos])
+		// строка пуста, либо в ней присутствует ошибка кодировки
+		// как бы то нибыло, цифра не найдена
+		if rr == utf8.RuneError {
+			return 0, -1
 		}
 		if unicode.IsDigit(rr) {
 			num, _ := strconv.Atoi(string(rr))
-			return num, nil
+			return num, pos
 		}
-		last -= w
+		pos -= w
 	}
 }
