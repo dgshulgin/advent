@@ -11,6 +11,14 @@ type Set struct {
 	blue  int
 }
 
+func (s1 Set) max(s2 Set) Set {
+	return Set{
+		red:   max(s1.red, s2.red),
+		green: max(s1.green, s2.green),
+		blue:  max(s1.blue, s2.blue),
+	}
+}
+
 // 3 green, 4 blue, 1 red
 func NewSetFromString(input string) Set {
 	set := Set{}
@@ -38,6 +46,14 @@ type Game struct {
 	title  string
 	party  []Set
 	limits Set
+}
+
+func (g Game) Power() int {
+	m := g.party[0]
+	for _, p := range g.party {
+		m = m.max(p)
+	}
+	return m.red * m.green * m.blue
 }
 
 // input form: "Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue"

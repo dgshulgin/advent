@@ -76,4 +76,61 @@ func TestGame(t *testing.T) {
 		}
 		fmt.Printf("--- Answer is %d ---\n", sum)
 	})
+
+	t.Run("Star game - пробная", func(t *testing.T) {
+		limits := Set{red: 12, green: 13, blue: 14}
+
+		party1 := []Set{{blue: 3, red: 4}, {red: 1, green: 2, blue: 6}, {green: 2}}
+		party2 := []Set{{blue: 1, green: 2}, {green: 3, blue: 4, red: 1}, {green: 1, blue: 1}}
+		party3 := []Set{{green: 8, blue: 6, red: 20}, {blue: 5, red: 4, green: 13}, {green: 5, red: 1}}
+		party4 := []Set{{green: 1, red: 3, blue: 6}, {green: 3, red: 6}, {green: 3, blue: 15, red: 14}}
+		party5 := []Set{{red: 6, blue: 1, green: 3}, {blue: 2, red: 1, green: 2}}
+
+		type GamePower struct {
+			p int
+			g Game
+		}
+		games := []GamePower{
+			{p: 48, g: Game{title: "Game 1", party: party1, limits: limits}},
+			{p: 12, g: Game{title: "Game 2", party: party2, limits: limits}},
+			{p: 1560, g: Game{title: "Game 3", party: party3, limits: limits}},
+			{p: 630, g: Game{title: "Game 4", party: party4, limits: limits}},
+			{p: 36, g: Game{title: "Game 5", party: party5, limits: limits}},
+		}
+
+		var sum int
+		for _, gg := range games {
+			pow := gg.g.Power()
+			//fmt.Printf("power expect %d, but act %d for game %v\n", gg.p, pow, gg.g)
+			assert.EqualValues(t, gg.p, pow)
+			sum += pow
+		}
+		assert.EqualValues(t, 2286, sum)
+	})
+
+	t.Run("Start game - Большой тест, данные из input.txt", func(t *testing.T) {
+		path, ok := os.LookupEnv("TR_INPUT")
+		if !ok {
+			t.Fatalf("input data path undefined, declare TR_INPUT")
+		}
+		file, _ := os.Open(path)
+		defer file.Close()
+
+		var gamesInput []string
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			gamesInput = append(gamesInput, scanner.Text())
+		}
+
+		limits := Set{red: 12, green: 13, blue: 14}
+
+		var sum int
+		for _, inp := range gamesInput {
+			game := NewGameFromString(inp, limits)
+			pow := game.Power()
+			sum += pow
+		}
+
+		fmt.Printf("--- Star answer is %d ---\n", sum)
+	})
 }
